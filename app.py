@@ -1,5 +1,7 @@
 import os
 from io import StringIO
+
+import PyPDF2
 import pandas as pd
 from collections import Counter
 import en_core_web_sm
@@ -10,9 +12,12 @@ from spacy.matcher import PhraseMatcher
 
 # Function to read resumes from the folder one by one
 # mypath = 'Resumes'  # enter your path here where you saved the resumes
-# onlyfiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
-
-
+# only_files = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
+# file_names = []
+# for file in only_files:
+#     base = os.path.basename(file)
+#     file_names.append(base)
+#
 # def pdfextract(filename):
 #     with open(filename, 'rb') as pdf_file:
 #         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -88,20 +93,24 @@ def create_profile(text, file_name):
 # code to execute/call the above functions
 
 
-def resume_parser(text, file_name):
+def resume_parser(only_files, file_names):
     final_database = pd.DataFrame()
-    dat = create_profile(text, file_name)
-    final_database = final_database._append(dat)
+    for i in range(len(only_files)):
+        dat = create_profile(only_files[i], file_names[i])
+        final_database = final_database._append(dat)
 
     # code to count words under each category and visulaize it through Matplotlib
+    if not final_database.empty:
+        final_database2 = final_database['Keyword'].groupby(
+            [final_database['Candidate Name'], final_database['Subject']]).count().unstack()
+        # print(final_database2)
+        final_database2.reset_index(inplace=True)
+        final_database2.fillna(0, inplace=True)
+        new_data = final_database2.iloc[:, 1:]
+        new_data.index = final_database2['Candidate Name']
+        new_data.to_csv('sample.csv')
+        # print(new_data)
+        return new_data
 
-    final_database2 = final_database['Keyword'].groupby(
-        [final_database['Candidate Name'], final_database['Subject']]).count().unstack()
-    final_database2.reset_index(inplace=True)
-    final_database2.fillna(0, inplace=True)
-    new_data = final_database2.iloc[:, 1:]
-    new_data.index = final_database2['Candidate Name']
-    new_data.to_csv('sample.csv')
-    print(new_data)
-    return new_data
 
+# resume_parser(only_files, file_names)
