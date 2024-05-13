@@ -10,7 +10,7 @@ nlp = en_core_web_sm.load()
 from spacy.matcher import PhraseMatcher
 
 
-# Function to read resumes from the folder one by one
+# # Function to read resumes from the folder one by one
 # mypath = 'Resumes'  # enter your path here where you saved the resumes
 # only_files = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
 # file_names = []
@@ -109,7 +109,7 @@ def resume_parser(only_files, file_names):
         new_data = final_database2.iloc[:, 1:]
         new_data.index = final_database2['Candidate Name']
         new_data.to_csv('sample.csv')
-        # print(new_data)
+        print(new_data)
         return new_data
 
 

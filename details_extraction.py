@@ -6,6 +6,7 @@ import re
 
 nlp = en_core_web_sm.load()
 
+
 text = '''ANNAS FURQUAN PASHA
 7995027220 ⋄Hyderabad, Telangana
 annasfurquan27@gmail.com ⋄https://github.com/Annas-Furquan-Pasha
@@ -13,7 +14,7 @@ OBJECTIVE
 Enthusiastic Flutter and React Developer with a strong passion for creating innovative and user-friendly applications.
 A motivated team player with excellent problem-solving skills and a drive to deliver exceptional results.
 EDUCATION
-M. Tech   
+M. Tech
 Jawaharlal Nehru Technological University Hyderabad
 B.Tech in Computer Science Engineering 2024
 •Current CGPA : 8.80
@@ -58,7 +59,7 @@ CERTIFICATIONS
 •Course completion certificate from Udemy for completing Flutter-dart full course
 ACHIEVEMENTS
 •solved 100+ questions in Data Structures and Algorithms
-•Organised a successful event ’Radium Cricket’ at college during cultural fest 
+•Organised a successful event ’Radium Cricket’ at college during cultural fest
 HOBBIES
 •Touch Typing
 •playing Cricket, Basket Ball
@@ -75,7 +76,6 @@ my knowledge in a real-world setting: As a dedicated team player;
 am committed to continuous learning
 and excited to grow alongside the company in pursuit of mutual success:
 Education
-M Tech
 JAWAHARLAL NEHRU TECHNOLOGICAL UNIVERSITY HYDERABAD
 2024
 B.Tech in Computer Science and Engineering
@@ -100,6 +100,8 @@ messages aren't recorded once the session gets terminated:
 Built using : HTML, CSS, node js'''
 files = [text, text2]
 file_names = ['annas', 'vamshi']
+
+
 def education_extraction(files, file_names):
     data = pd.DataFrame(columns=['Candidate Name', 'Qualification'])
     for z in range(len(files)):
@@ -125,7 +127,7 @@ def education_extraction(files, file_names):
             span = doc[start: end]  # get the matched slice of the doc
             d.append((rule_id, span.text))
         keywords = "\n".join(f'{i[0]} {i[1]} ({j})' for i, j in Counter(d).items())
-        print(keywords)
+        # print(keywords)
         if 'MTech' in keywords:
             data.loc[len(data)] = {'Candidate Name': file_names[z], 'Qualification': 'M Tech'}
         elif 'BTech' in keywords:
@@ -136,38 +138,52 @@ def education_extraction(files, file_names):
     return data
 
 
-def get_number(text):
-    """
-    This function returns a list of a phone number from a list of text
-    :param text: list of text
-    :return: list of a phone number
-    """
+def get_number(files):
     # compile helps us to define a pattern for matching it in the text
+    data = pd.DataFrame(columns=['Number'])
     pattern = re.compile(
-        r'([+(]?\d+[)\-]?[ \t\r\f\v]*[(]?\d{2,}[()\-]?[ \t\r\f\v]*\d{2,}[()\-]?[ \t\r\f\v]*\d*[ \t\r\f\v]*\d*[ \t\r\f\v]*)')
-    # findall finds the pattern defined in compile
-    pt = pattern.findall(text)
+    r'([+(]?\d+[)\-]?[ \t\r\f\v]*[(]?\d{2,}[()\-]?[ \t\r\f\v]*\d{2,}[()\-]?'
+    r'[ \t\r\f\v]*\d*[ \t\r\f\v]*\d*[ \t\r\f\v]*)')
+    for i in range(len(files)):
+        # findall finds the pattern defined in compile
+        pt = pattern.findall(files[i])
+        # sub replaces a pattern matching in the text
+        pt = [re.sub(r'[,.]', '', ah) for ah in pt if len(re.sub(r'[()\-.,\s+]', '', ah)) > 9]
+        pt = [re.sub(r'\D$', '', ah).strip() for ah in pt]
+        pt = [ah for ah in pt if len(re.sub(r'\D', '', ah)) <= 15]
 
-    # sub replaces a pattern matching in the text
-    pt = [re.sub(r'[,.]', '', ah) for ah in pt if len(re.sub(r'[()\-.,\s+]', '', ah)) > 9]
-    pt = [re.sub(r'\D$', '', ah).strip() for ah in pt]
-    pt = [ah for ah in pt if len(re.sub(r'\D', '', ah)) <= 15]
+        for ah in list(pt):
+            # split splits a text
+            if len(ah.split('-')) > 3: continue
+            for x in ah.split("-"):
+                try:
+                    # isdigit checks whether the text is number or not
+                    if x.strip()[-4:].isdigit():
+                        if int(x.strip()[-4:]) in range(1900, 2100):
+                            pt.remove(ah)
+                except:
+                    pass
+            number = list(set(pt))
+            data.loc[len(data)] = {'Number': number}
+    return data
 
-    for ah in list(pt):
-        # split splits a text
-        if len(ah.split('-')) > 3: continue
-        for x in ah.split("-"):
-            try:
-                # isdigit checks whether the text is number or not
-                if x.strip()[-4:].isdigit():
-                    if int(x.strip()[-4:]) in range(1900, 2100):
-                        pt.remove(ah)
 
-            except:
-                pass
+def get_email(files):
+    # compile helps us to define a pattern for matching it in the text
+    data = pd.DataFrame(columns=['Email'])
+    r = re.compile(r'[A-Za-z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
+    for i in range(len(files)):
+        data.loc[len(data)] = {'Email': r.findall(str(files[i]))}
+    return data
 
-        number = None
-        number = list(set(pt))
-        return number
 
-print(education_extraction(files, file_names))
+def get_details(files, file_names):
+    education = education_extraction(files, file_names)
+    number = get_number(files)
+    email = get_email(files)
+    data = pd.DataFrame(education)
+    data.insert(2, 'Number', number['Number'], True)
+    data.insert(3, 'Email', email['Email'], True)
+    return data
+
+print(get_details(files, file_names))

@@ -10,12 +10,12 @@ bayesian inference,pca,object detection,knitr,matplotlib,word embedding,teradata
 factor analysis,decision trees,yolo,,scipy,Isi,google big query,express
 forecasting,svd,gpu,,bokeh,spacy,aws lambda,html
 markov chain,ensemble models,cuda,,statsmodel,gensim,aws emr,css
-monte carlo,boltzman machine,tensorflow,,,nltk,hive
-,,Istm,,,nmf,hadoop
-,,gan,,,doc2vec,sql
-,,opencv,,,cbow,
-,,,,,bag of words,
-,,,,,skip gram,
-,,,,,bert,
-,,,,,sentiment analysis,
-,,,,,chat bot,
+monte carlo,boltzman machine,tensorflow,,,nltk,hive,
+,,Istm,,,nmf,hadoop,
+,,gan,,,doc2vec,sql,
+,,opencv,,,cbow,,
+,,,,,bag of words,,
+,,,,,skip gram,,
+,,,,,bert,,
+,,,,,sentiment analysis,,
+,,,,,chat bot,,

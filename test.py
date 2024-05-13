@@ -137,4 +137,4 @@ def get_email(text):
     r = re.compile(r'[A-Za-z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
     return r.findall(str(text))
 
-print(get_email(text2))
+print(get_number(text2))
